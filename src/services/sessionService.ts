@@ -1,6 +1,8 @@
 class SessionService {
     private totalActiveTime: number = parseInt(localStorage.getItem('cognia_total_active_seconds') || '0', 10);
     private deviceTotalSeconds: number = 0;
+    private apps: Record<string, number> = {};
+    private webActivity: Record<string, number> = {};
     private lastUpdate: number = Date.now();
 
     constructor() {
@@ -43,7 +45,9 @@ class SessionService {
             const res = await fetch('http://localhost:8080/stats');
             if (res.ok) {
                 const data = await res.json();
-                this.deviceTotalSeconds = data.total_seconds;
+                this.deviceTotalSeconds = data.total_seconds || 0;
+                this.apps = data.apps || {};
+                this.webActivity = data.web_activity || {};
             }
         } catch (e) {
             // Bridge might not be running, fail silently
@@ -61,6 +65,14 @@ class SessionService {
 
     getDeviceTotalSeconds(): number {
         return this.deviceTotalSeconds;
+    }
+
+    getApps(): Record<string, number> {
+        return this.apps;
+    }
+
+    getWebActivity(): Record<string, number> {
+        return this.webActivity;
     }
 
     formatSeconds(total: number): string {

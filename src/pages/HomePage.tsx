@@ -1,13 +1,17 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Activity, Clock, ArrowRight, Shield, Heart, Globe, TrendingUp, Bed, Music, PenTool, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Activity, Shield, ArrowRight, TrendingUp, Heart, Clock } from 'lucide-react';
 import { authService } from '../services/authService';
 import { sessionService } from '../services/sessionService';
+import DigitalActivity from '../components/DigitalActivity';
+import { AnalyticsDashboard } from '../components/AnalyticsDashboard';
 
 const HomePage: React.FC = () => {
-    const [cogniaTime, setCogniaTime] = React.useState(sessionService.getFormattedTime());
-    const [deviceTime, setDeviceTime] = React.useState(sessionService.getFormattedDeviceTime());
+    const [cogniaTime, setCogniaTime] = useState(sessionService.getFormattedTime());
+    const [deviceTime, setDeviceTime] = useState(sessionService.getFormattedDeviceTime());
+    const [showDigitalActivity, setShowDigitalActivity] = useState(false);
+    const [showAnalytics, setShowAnalytics] = useState(false);
 
     React.useEffect(() => {
         sessionService.resetDaily();
@@ -146,7 +150,7 @@ const HomePage: React.FC = () => {
                                     <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
-                                            animate={{ width: `${Math.min(100, (sessionService.getDailyTotalSeconds() / Math.max(1, sessionService.getDeviceTotalSeconds())) * 100)}%` }}
+                                            animate={{ width: `${Math.min(100, (sessionService.getDailyTotalSeconds() / Math.max(1, sessionService.getDeviceTotalSeconds())) * 100)}% ` }}
                                             className="h-full bg-primary"
                                         />
                                     </div>
@@ -156,13 +160,142 @@ const HomePage: React.FC = () => {
                         </div>
                     </motion.div>
 
-                    {/* Future Capacity / System Info moved back to 3rd col or placeholder */}
-                    <div className="glass-panel p-10 h-full border-white/5 border-dashed bg-transparent flex flex-col items-center justify-center text-center opacity-40 group hover:opacity-100 transition-opacity">
-                        <Shield className="w-12 h-12 text-slate-500 mb-6 group-hover:text-primary transition-colors" />
-                        <h4 className="text-xl font-bold text-slate-400">Expansion Slot</h4>
-                        <p className="text-sm text-slate-500 mt-2">Ready for behavioral modeling <br /> integration v3.0</p>
-                    </div>
+                    {/* Digital Activity Card */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 }}
+                        whileHover={{ y: -5 }}
+                        className="group relative cursor-pointer"
+                        onClick={() => setShowDigitalActivity(true)}
+                    >
+                        <div className="glass-panel p-10 h-full border-white/5 group-hover:border-accent/50 transition-all duration-500 overflow-hidden">
+                            <div className="relative z-10">
+                                <div className="w-14 h-14 bg-accent/20 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                                    <Globe className="text-accent w-8 h-8" />
+                                </div>
+                                <h3 className="text-3xl font-bold mb-4">Digital Activity</h3>
+                                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                                    Track your application usage and web browsing patterns in real-time.
+                                </p>
+                                <div className="flex items-center gap-2 text-accent font-bold">
+                                    View Activity <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-accent/20 transition-colors" />
+                        </div>
+                    </motion.div>
                 </div>
+
+                {/* Second Row - Fit Tracker */}
+                <div className="grid grid-cols-1 lg:grid-cols-1 gap-8 max-w-7xl mx-auto mt-8">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.6 }}
+                        whileHover={{ y: -5 }}
+                        className="group relative cursor-pointer"
+                        onClick={() => window.open('http://localhost:5174', '_blank')}
+                    >
+                        <div className="glass-panel p-10 h-full border-white/5 group-hover:border-purple-500/50 transition-all duration-500 overflow-hidden">
+                            <div className="relative z-10">
+                                <div className="w-14 h-14 bg-purple-500/20 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                                    <Bed className="text-purple-500 w-8 h-8" />
+                                </div>
+                                <h3 className="text-3xl font-bold mb-4">Sleep & Steps Tracker</h3>
+                                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                                    Connect Google Fit to monitor your sleep patterns, step count, and overall wellness insights.
+                                </p>
+                                <div className="flex items-center gap-2 text-purple-500 font-bold">
+                                    Open Tracker <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-purple-500/20 transition-colors" />
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Third Row - Spotify and Journal */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto mt-8">
+                    {/* Spotify Mood-Core Card */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7 }}
+                        whileHover={{ y: -5 }}
+                        className="group relative cursor-pointer"
+                        onClick={() => window.open('http://localhost:3000', '_blank')}
+                    >
+                        <div className="glass-panel p-10 h-full border-white/5 group-hover:border-green-500/50 transition-all duration-500 overflow-hidden">
+                            <div className="relative z-10">
+                                <div className="w-14 h-14 bg-green-500/20 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                                    <Music className="text-green-500 w-8 h-8" />
+                                </div>
+                                <h3 className="text-3xl font-bold mb-4">Mood-Core</h3>
+                                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                                    Analyze your behavioral rhythm through Spotify metadata with real-time valence maps and emotional resonance scores.
+                                </p>
+                                <div className="flex items-center gap-2 text-green-500 font-bold">
+                                    Connect Spotify <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-green-500/20 transition-colors" />
+                        </div>
+                    </motion.div>
+
+                    {/* Journal Digital Sanctuary Card */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.8 }}
+                        whileHover={{ y: -5 }}
+                        className="group relative cursor-pointer"
+                        onClick={() => window.open('http://localhost:3000/journal', '_blank')}
+                    >
+                        <div className="glass-panel p-10 h-full border-white/5 group-hover:border-blue-500/50 transition-all duration-500 overflow-hidden">
+                            <div className="relative z-10">
+                                <div className="w-14 h-14 bg-blue-500/20 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                                    <PenTool className="text-blue-500 w-8 h-8" />
+                                </div>
+                                <h3 className="text-3xl font-bold mb-4">Digital Sanctuary</h3>
+                                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                                    A private space for your consciousness. Rich text journaling, mood tracking, and AI-powered sentiment analysis.
+                                </p>
+                                <div className="flex items-center gap-2 text-blue-500 font-bold">
+                                    Enter Sanctuary <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-blue-500/20 transition-colors" />
+                        </div>
+                    </motion.div>
+
+                    {/* Analytics Card */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.9 }}
+                        whileHover={{ y: -5 }}
+                        className="group relative cursor-pointer"
+                        onClick={() => setShowAnalytics(true)}
+                    >
+                        <div className="glass-panel p-10 h-full border-white/5 group-hover:border-purple-400/50 transition-all duration-500 overflow-hidden">
+                            <div className="relative z-10">
+                                <div className="w-14 h-14 bg-purple-400/20 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                                    <BarChart3 className="text-purple-400 w-8 h-8" />
+                                </div>
+                                <h3 className="text-3xl font-bold mb-4">Unified Analytics</h3>
+                                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                                    Comprehensive wellness insights aggregating data from all your tracking systems with AI-powered scoring.
+                                </p>
+                                <div className="flex items-center gap-2 text-purple-400 font-bold">
+                                    View Analytics <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </div>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-400/10 blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-purple-400/20 transition-colors" />
+                        </div>
+                    </motion.div>
+                </div>
+
 
                 <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="flex items-center gap-4 text-slate-500">
@@ -179,6 +312,11 @@ const HomePage: React.FC = () => {
                     </div>
                 </div>
             </main>
+
+            <AnimatePresence>
+                {showDigitalActivity && <DigitalActivity onClose={() => setShowDigitalActivity(false)} />}
+                {showAnalytics && <AnalyticsDashboard onClose={() => setShowAnalytics(false)} />}
+            </AnimatePresence>
         </div>
     );
 };

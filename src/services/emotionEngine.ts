@@ -29,12 +29,17 @@ class EmotionEngine {
 
     async predict(imageSource: HTMLCanvasElement | string): Promise<EmotionResult[]> {
         if (!this.classifier) {
+            console.log('Classifier not ready, initializing...');
             await this.init();
         }
-        if (!this.classifier) return [];
+        if (!this.classifier) {
+            console.error('Classifier still not available after init');
+            return [];
+        }
 
         try {
             const results = await this.classifier(imageSource);
+            console.log('🎭 Emotion results:', results);
             return results.map((res: any) => {
                 const label = res.label.toLowerCase() as any;
                 // Add sensitivity bias for subtle emotions like 'sad'
@@ -42,7 +47,7 @@ class EmotionEngine {
                 return { label, score };
             });
         } catch (error) {
-            console.error('Prediction error:', error);
+            console.error('❌ Prediction error:', error);
             return [];
         }
     }

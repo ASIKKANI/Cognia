@@ -9,7 +9,7 @@ app = FastAPI(title="Cognia Backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://localhost:5174"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -65,10 +65,10 @@ def callback(request: Request, code: str, state: str = None):
             token_file.write(credentials.to_json())
             
         # Redirect back to frontend
-        return RedirectResponse("http://localhost:5173?connected=true")
+        return RedirectResponse("http://localhost:5174?connected=true")
     except Exception as e:
         # Redirect to frontend with error
-        return RedirectResponse(f"http://localhost:5173?error={str(e)}")
+        return RedirectResponse(f"http://localhost:5174?error={str(e)}")
 
 from services.fit_service import sync_data
 from services.processing import process_and_validate

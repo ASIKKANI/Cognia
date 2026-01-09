@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useCamera } from '../hooks/useCamera';
 import { emotionEngine } from '../services/emotionEngine';
 import { faceDetector } from '../services/faceDetector';
+import { emotionStorage } from '../services/emotionStorage';
 import type { WellbeingData, WellbeingIndicator, MonitoringSchedule } from '../types';
 import { calculateWellbeing } from '../utils/wellbeingAggregator';
 import { XAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
@@ -122,6 +123,10 @@ const MonitorPage: React.FC = () => {
                                     dominantEmotion: sortedResults[0].label,
                                     confidence: sortedResults[0].score
                                 };
+
+                                // Save to localStorage for analytics
+                                emotionStorage.saveEmotion(sortedResults[0].label, sortedResults[0].score);
+
                                 setHistory(prev => [...prev.slice(-99), entry]);
                             }
                         }
