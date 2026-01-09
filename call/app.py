@@ -85,9 +85,16 @@ async def webhook(request: Request):
             elif not isinstance(dur, (int, float)):
                 dur = 0
             
+            # Handle name extraction robustly (empty or None -> "Unknown")
+            raw_name = raw_body.get('name')
+            if not raw_name or str(raw_name).strip() == "":
+                final_name = "Unknown"
+            else:
+                final_name = str(raw_name)
+
             # Construct cleaned data
             clean_data = {
-                "name": str(raw_body.get('name', 'Unknown')),
+                "name": final_name,
                 "number": str(raw_body.get('number', '')),
                 "duration": int(dur),
                 "type": str(raw_body.get('type', 'INCOMING')).upper(),
