@@ -1,0 +1,25 @@
+# General
+.DS_Store
+.env
+.venv
+env/
+venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+
+# Python / Backend
+fit/backend/client_secret.json
+fit/backend/token.json
+fit/backend/data_raw.json
+fit/backend/data_clean.csv
+*.sqlite3
+
+# Frontend
+fit/frontend/dist/
+fit/frontend/.env.local
