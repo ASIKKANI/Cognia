@@ -57,3 +57,24 @@ fit/backend/data_calendar.json
 # Frontend (from remote)
 fit/frontend/dist/
 fit/frontend/.env.local
+
+
+
+# Ignore virtual environments
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore runtime logs and data (but keeping real_call_logs for now if you want them in repo)
+# debug_payloads.json
+# real_call_logs.json
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE files
+.vscode/
+.idea/
