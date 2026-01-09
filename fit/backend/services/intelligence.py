@@ -71,15 +71,69 @@ def calculate_insights():
          else:
              trend = f"{trend} (Sleep +)"
 
+    # Load Calendar Context
+    import json
+    context_path = BASE_DIR / "data_calendar.json"
+    calendar_data = {}
+    if context_path.exists():
+        with open(context_path, 'r') as f:
+            calendar_data = json.load(f)
+            
     # Consistency Check (Variability)
     recent_std = recent['steps'].std()
     if recent_std > (baseline_steps_std * 2):
         confidence = "Low"
         
+    # Contextual Explanation
+    explanation = "Routine is consistent."
+    
+    # Check if recent days had high calendar load
+    recent_dates = recent['date'].dt.strftime('%Y-%m-%d').tolist()
+    high_load_days = 0
+    travel_days = 0
+    
+    for d in recent_dates:
+        if d in calendar_data:
+            day_ctx = calendar_data[d]
+            if day_ctx.get('schedule_density') == 'High':
+                high_load_days += 1
+            if day_ctx.get('is_travel_day'):
+                travel_days += 1
+                
+    if status == "Needs Attention" or trend == "Declining":
+        if travel_days > 0:
+            explanation = "Deviation likely caused by recent travel."
+            confidence = "High" # Context explains the drop
+        elif high_load_days > 0:
+            explanation = "Schedule density (high workload) correlates with reduced activity."
+            confidence = "High"
+        else:
+            explanation = "Unexplained drop in activity. Monitor sleep patterns."
+    elif status == "Energetic":
+        explanation = "Positive trend in activity levels."
+        
+    # Prepare Calendar Highlights for Frontend
+    upcoming_events = []
+    # Get last 7 days + Look forward logic (if we had future data, but here using recent history)
+    # Actually, let's just send the recent relevant calendar days
+    for date_key, ctx in calendar_data.items():
+        # Only include if it has tags or high density
+        if ctx.get('tags') or ctx.get('schedule_density') == 'High':
+            upcoming_events.append({
+                "date": date_key,
+                "tags": ctx.get('tags', []),
+                "density": ctx.get('schedule_density'),
+                "events": ctx.get('events', [])
+            })
+            
+    # Sort by date
+    upcoming_events.sort(key=lambda x: x['date'], reverse=True)
+
     return {
         "status": status,
         "trend": trend,
         "confidence": confidence,
+        "explanation": explanation,
         "metrics": {
             "baseline_steps": int(baseline_steps),
             "recent_steps": int(recent_steps),
@@ -89,5 +143,6 @@ def calculate_insights():
             "recent_sleep": int(recent_sleep),
             "z_score": round(z_score, 2)
         },
-        "history": df[['date', 'steps', 'active_minutes', 'sleep_minutes']].tail(30).to_dict(orient='records')
+        "history": df[['date', 'steps', 'active_minutes', 'sleep_minutes']].tail(30).to_dict(orient='records'),
+        "calendar_context": upcoming_events[:10] # Top 10 recent relevant days
     }

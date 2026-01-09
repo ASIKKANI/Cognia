@@ -7,28 +7,12 @@ from googleapiclient.discovery import build
 from config import BASE_DIR, CLIENT_SECRET_FILE
 import pandas as pd
 
-TOKEN_FILE = BASE_DIR / "token.json"
+from services.auth import get_credentials
 
-def get_credentials():
-    if not TOKEN_FILE.exists():
-        return None
-    
-    with open(TOKEN_FILE, 'r') as f:
-        data = json.load(f)
-        creds = Credentials.from_authorized_user_info(data)
-    
-    if creds and creds.expired and creds.refresh_token:
-        # Load helper to refresh
-        # We need the client_secret.json content to refresh
-        # But Credentials.from_authorized_user_info usually handles it if client_config is passed or if we use proper flow
-        # Actually simplest is to just request refresh
-        creds.refresh(Request())
-        
-        # Save back
-        with open(TOKEN_FILE, 'w') as f:
-            f.write(creds.to_json())
-            
-    return creds
+# TOKEN_FILE = BASE_DIR / "token.json" 
+# (TOKEN_FILE usage moved to auth.py) - keeping the functions that need services...
+
+# Removed local get_credentials definition
 
 def get_fitness_service():
     creds = get_credentials()

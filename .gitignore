@@ -52,6 +52,7 @@ fit/backend/client_secret.json
 fit/backend/token.json
 fit/backend/data_raw.json
 fit/backend/data_clean.csv
+fit/backend/data_calendar.json
 
 # Frontend (from remote)
 fit/frontend/dist/

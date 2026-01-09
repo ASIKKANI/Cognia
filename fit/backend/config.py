@@ -18,7 +18,8 @@ with open(CLIENT_SECRET_FILE, 'r') as f:
 SCOPES = [
     "https://www.googleapis.com/auth/fitness.activity.read",
     "https://www.googleapis.com/auth/fitness.sleep.read",
-    "https://www.googleapis.com/auth/fitness.heart_rate.read"
+    "https://www.googleapis.com/auth/fitness.heart_rate.read",
+    "https://www.googleapis.com/auth/calendar.readonly"
 ]
 
 # Redirect URI (Must match what's in the Google Cloud Console)

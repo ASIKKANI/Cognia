@@ -72,13 +72,19 @@ def callback(request: Request, code: str, state: str = None):
 
 from services.fit_service import sync_data
 from services.processing import process_and_validate
+from services.calendar_service import sync_calendar_context
 
 @app.post("/sync")
 def trigger_sync():
     try:
         raw_data = sync_data()
+        calendar_context = sync_calendar_context()
         quality_report = process_and_validate()
-        return {"status": "success", "quality": quality_report}
+        return {
+            "status": "success", 
+            "quality": quality_report,
+            "calendar_days_analyzed": len(calendar_context)
+        }
     except Exception as e:
         import traceback
         traceback.print_exc()

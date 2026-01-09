@@ -110,16 +110,63 @@ const Dashboard = () => {
                 </div>
             </div>
 
+            {/* Calendar & Context Tab */}
+            <div className="card" style={{ marginBottom: '2rem' }}>
+                <h3 style={{ marginBottom: '1rem' }}>Context: Key Dates</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {data.calendar_context && data.calendar_context.length > 0 ? (
+                        data.calendar_context.map((evt, idx) => (
+                            <div key={idx} style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '0.75rem',
+                                backgroundColor: '#1e293b',
+                                borderRadius: '8px'
+                            }}>
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontWeight: 600 }}>{new Date(evt.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', weekday: 'short' })}</span>
+                                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                        {evt.density === 'High' ? 'High Workload' : evt.density === 'Medium' ? 'Moderate Load' : 'Light Load'}
+                                    </span>
+                                </div>
+                                <div>
+                                    {evt.tags.map(tag => (
+                                        <span key={tag} style={{
+                                            fontSize: '0.7rem',
+                                            padding: '2px 8px',
+                                            borderRadius: '12px',
+                                            marginLeft: '6px',
+                                            backgroundColor: tag === 'Travel' ? '#3b82f6' : tag === 'High Stakes' ? '#ef4444' : '#10b981',
+                                            color: 'white'
+                                        }}>
+                                            {tag}
+                                        </span>
+                                    ))}
+                                    {/* Visualize event details on hover could be next, for now just tags */}
+                                    {evt.events.length > 0 && evt.tags.length === 0 && (
+                                        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{evt.events.length} Events</span>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div style={{ color: '#64748b', fontStyle: 'italic' }}>No significant calendar events detected.</div>
+                    )}
+                </div>
+            </div>
+
             {/* Why Selection */}
             <div className="card">
                 <h3>Why am I seeing this?</h3>
                 <p style={{ lineHeight: 1.6, color: '#cbd5e1' }}>
-                    Your behavioral signal is based on a multi-factor analysis of your <strong>Activity</strong> and <strong>Sleep</strong>.
-                    <br /><br />
-                    • <strong>Steps & Active Minutes:</strong> Routine is {metrics.z_score < -1 ? 'significantly lower' : metrics.z_score > 1 ? 'higher' : 'consistent with'} your baseline.<br />
-                    • <strong>Sleep:</strong> You are averaging {Math.round(metrics.recent_sleep / 60)} hours of sleep recently.
-                    {Math.abs(metrics.recent_sleep - metrics.baseline_sleep) > 60 && " Significant changes in sleep duration were detected."}
+                    {data.explanation}
                 </p>
+                <div style={{ marginTop: '1rem', borderTop: '1px solid #334155', paddingTop: '1rem' }}>
+                    <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
+                        Analysis factors: Activity (Steps/Active Min), Sleep Patterns, and Calendar Schedule.
+                    </p>
+                </div>
             </div>
         </div>
     );
