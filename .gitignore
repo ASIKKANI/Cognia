@@ -45,3 +45,14 @@ python_sdk/
 .pytest_cache/
 .coverage
 .mypy_cache/
+*.sqlite3
+
+# Backend (from remote)
+fit/backend/client_secret.json
+fit/backend/token.json
+fit/backend/data_raw.json
+fit/backend/data_clean.csv
+
+# Frontend (from remote)
+fit/frontend/dist/
+fit/frontend/.env.local
