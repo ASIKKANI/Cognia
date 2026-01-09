@@ -125,17 +125,75 @@ def fetch_metrics(service, start_time, end_time):
         
     return data
 
+def fetch_sleep_sessions(service, start_time, end_time):
+    """
+    Fetches sleep data using the Sessions API (Robust for sleep).
+    Activity Type 72 = Sleep.
+    """
+    try:
+        # Convert to RFC3339 string as required by sessions list
+        start_str = start_time.isoformat() + 'Z'
+        end_str = end_time.isoformat() + 'Z'
+        
+        response = service.users().sessions().list(
+            userId='me',
+            startTime=start_str,
+            endTime=end_str,
+            activityType=[72], # Sleep only
+            includeDeleted=False
+        ).execute()
+        
+        sessions = response.get('session', [])
+        
+        # Aggregate sleep duration per day
+        daily_sleep = {}
+        for session in sessions:
+             # Session time is in millis
+             start_ms = int(session.get('startTimeMillis', 0))
+             end_ms = int(session.get('endTimeMillis', 0))
+             duration_min = (end_ms - start_ms) / 60000
+             
+             # Map to Date (based on end time usually, or start time?)
+             # Sleep usually counts for the day you wake up (End Time)
+             date_str = datetime.datetime.fromtimestamp(end_ms/1000).date().isoformat()
+             
+             if date_str not in daily_sleep:
+                 daily_sleep[date_str] = 0
+             daily_sleep[date_str] += duration_min
+             
+        return daily_sleep
+    except Exception as e:
+        print(f"Error fetching sleep sessions: {str(e)}")
+        return {}
+
 def sync_data():
     service = get_fitness_service()
     
     now = datetime.datetime.now()
     start_time = now - datetime.timedelta(days=30)
     
-    metrics = fetch_metrics(service, start_time, now)
+    # 1. Fetch Aggregated Metrics (Steps, Active Min)
+    metrics_list = fetch_metrics(service, start_time, now)
+    
+    # 2. Fetch Sleep Sessions (Sessions API)
+    sleep_map = fetch_sleep_sessions(service, start_time, now)
+    
+    # 3. Merge Sleep into Metrics
+    final_data = []
+    for entry in metrics_list:
+        d = entry['date']
+        # If we have Session-based sleep, overwrite/set the sleep_minutes
+        if d in sleep_map:
+            entry['sleep_minutes'] = int(sleep_map[d])
+        else:
+             # Keep existing (which is 0 from fallback) or set to 0
+             # entry['sleep_minutes'] = 0
+             pass
+        final_data.append(entry)
     
     # Store Raw Data (JSON)
     raw_path = BASE_DIR / "data_raw.json"
     with open(raw_path, 'w') as f:
-        json.dump(metrics, f)
+        json.dump(final_data, f)
         
-    return metrics
+    return final_data
