@@ -1,9 +1,10 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Activity, Music, Heart } from 'lucide-react';
+import { Activity, Music, Heart, Home } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 
 export default function Dashboard() {
     const { data: session } = useSession();
@@ -147,9 +148,16 @@ export default function Dashboard() {
                     <Activity size={32} color="#1DB954" />
                     <h1 style={{ fontSize: '1.8rem', fontWeight: 950, letterSpacing: '-1px' }}>Cognia <span style={{ color: '#333' }}>Mood-Core</span></h1>
                 </div>
-                <button onClick={handleLogout} style={{ border: '1px solid #1a1a1a', padding: '0.7rem 1.4rem', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', color: '#888', fontWeight: 700, cursor: 'pointer', transition: '0.3s' }} className="btn-secondary">
-                    SIGN OUT
-                </button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <Link href="/">
+                        <button style={{ border: '1px solid #1a1a1a', padding: '0.7rem', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', color: '#888', cursor: 'pointer', transition: '0.3s' }} className="btn-secondary" title="Home">
+                            <Home size={20} />
+                        </button>
+                    </Link>
+                    <button onClick={handleLogout} style={{ border: '1px solid #1a1a1a', padding: '0.7rem 1.4rem', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', color: '#888', fontWeight: 700, cursor: 'pointer', transition: '0.3s' }} className="btn-secondary">
+                        SIGN OUT
+                    </button>
+                </div>
             </header>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '2.5rem', zIndex: 10, position: 'relative' }}>

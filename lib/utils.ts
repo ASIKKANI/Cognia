@@ -20,3 +20,16 @@ export function isColorDark(color: string | null | undefined): boolean {
 
     return false;
 }
+
+export function stripHtml(html: string) {
+    if (!html) return "";
+    return html
+        .replace(/<[^>]+>/g, '') // Strip tags
+        .replace(/&nbsp;/g, ' ') // Replace entities
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .trim();
+}
